@@ -1,4 +1,4 @@
-## 0.5.0 (unreleased)
+## 0.5.0 (2025-12-04)
 
 - Dropped support for Python < 3.10
 
