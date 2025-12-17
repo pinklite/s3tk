@@ -661,5 +661,5 @@ To get started with development:
 ```sh
 git clone https://github.com/ankane/s3tk.git
 cd s3tk
-pip install -r requirements.txt
+pip install --group dev
 ```

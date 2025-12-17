@@ -25,3 +25,8 @@ Homepage = "https://github.com/ankane/s3tk"
 
 [project.scripts]
 s3tk = "s3tk:main"
+
+[dependency-groups]
+dev = [
+    "pytest"
+]
