@@ -1,4 +1,13 @@
-## 0.3.1 (unreleased)
+## 0.5.0 (2025-12-04)
+
+- Dropped support for Python < 3.10
+
+## 0.4.0 (2023-07-23)
+
+- Fixed warning with clint
+- Dropped support for Python < 3.8
+
+## 0.3.1 (2020-08-17)
 
 - Added experimental `--object-level-logging` option to `scan` command
 

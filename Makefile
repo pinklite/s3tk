@@ -1,12 +1,19 @@
-test:
-	py.test tests
+.PHONY: lint build publish clean docker docker-release
 
-install:
-	pip install -r requirements.txt
+lint:
+	pycodestyle . --ignore=E501
 
-publish:
-	rm -fr build dist s3tk.egg-info
-	python setup.py bdist_wheel --universal
-	ls dist
-	# twine upload dist/*
-	rm -fr build dist s3tk.egg-info
+build:
+	python3 -m build
+
+publish: clean build
+	twine upload dist/*
+
+clean:
+	rm -rf .pytest_cache dist s3tk.egg-info
+
+docker: clean
+	docker build --pull --no-cache --platform linux/amd64 -t ankane/s3tk:latest .
+
+docker-release:
+	docker buildx build --push --pull --no-cache --platform linux/amd64,linux/arm64 -t ankane/s3tk:latest -t ankane/s3tk:v0.5.0 .

@@ -2,12 +2,6 @@
 
 A security toolkit for Amazon S3
 
-> Another day, another leaky Amazon S3 bucket
->
-> &mdash; The Register, 12 Jul 2017
-
-Don’t be [the](https://www.theregister.co.uk/2017/07/12/14m_verizon_customers_details_out/)... [next](https://www.theregister.co.uk/2017/08/17/chicago_voter_leak/)... [big](https://www.theregister.co.uk/2017/09/05/twc_loses_4m_customer_records/)... [data](https://www.theregister.co.uk/2017/07/18/dow_jones_index_of_customers_not_prices_leaks_from_aws_repo/)... [leak](https://www.theregister.co.uk/2017/08/22/open_aws_s3_bucket_leaked_hotel_booking_service_data_says_kromtech/)
-
 ![Screenshot](https://gist.githubusercontent.com/ankane/13a9230353c78c0d5c35fd9319a23d98/raw/434b9c54bff9d41c398aa3b57f0d0494217ef7fa/console2.gif)
 
 :tangerine: Battle-tested at [Instacart](https://www.instacart.com/opensource)
@@ -64,7 +58,7 @@ Confirm correct log bucket(s) and prefix
 s3tk scan --log-bucket my-s3-logs --log-bucket other-region-logs --log-prefix "{bucket}/"
 ```
 
-Check CloudTrail object-level logging [master, experimental]
+Check CloudTrail object-level logging [experimental]
 
 ```sh
 s3tk scan --object-level-logging
@@ -667,5 +661,5 @@ To get started with development:
 ```sh
 git clone https://github.com/ankane/s3tk.git
 cd s3tk
-pip install -r requirements.txt
+pip install --group dev
 ```

@@ -1,18 +1,20 @@
-# -*- coding: utf-8 -*-
-
 import sys
-import os.path
 import json
 import fnmatch
 from collections import Counter, OrderedDict
+import warnings
 import boto3
 import botocore
 import click
 from joblib import Parallel, delayed
-from clint.textui import colored, puts, indent
 from .checks import AclCheck, PolicyCheck, PublicAccessCheck, LoggingCheck, VersioningCheck, EncryptionCheck, ObjectLoggingCheck
 
-__version__ = '0.3.0'
+# fix for https://github.com/kennethreitz-archive/clint/issues/185
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    from clint.textui import colored, puts, indent
+
+__version__ = '0.5.0'
 
 canned_acls = [
     {
@@ -48,6 +50,7 @@ canned_acls = [
 
 cached_s3 = None
 
+
 def s3():
     # memoize
     global cached_s3
@@ -66,10 +69,7 @@ def abort(message):
 
 
 def unicode_key(key):
-    if sys.version_info[0] < 3 and isinstance(key, unicode):
-        return key.encode('utf-8')
-    else:
-        return key
+    return key
 
 
 def perform(check):
@@ -273,7 +273,7 @@ def parallelize(bucket, only, _except, fn, args=(), versions=False):
     else:
         objects = bucket.objects.filter(Prefix=prefix) if prefix else bucket.objects.all()
 
-        if only and not '*' in only:
+        if only and '*' not in only:
             objects = [s3().Object(bucket, only)]
 
         return Parallel(n_jobs=24)(delayed(fn)(bucket.name, os.key, *args) for os in objects if object_matches(os.key, only, _except))
@@ -354,7 +354,7 @@ def fetch_policy(bucket):
 
 
 def print_dns_bucket(name, buckets, found_buckets):
-    if not name in found_buckets:
+    if name not in found_buckets:
         puts(name)
         with indent(2):
             if name in buckets:
@@ -431,7 +431,7 @@ def cli():
 @click.option('--skip-logging', is_flag=True, help='Skip logging check')
 @click.option('--skip-versioning', is_flag=True, help='Skip versioning check')
 @click.option('--skip-default-encryption', is_flag=True, help='Skip default encryption check')
-@click.option('--default-encryption', is_flag=True) # no op, can't hide from help until click 7 released
+@click.option('--default-encryption', is_flag=True)  # no op, can't hide from help until click 7 released
 @click.option('--object-level-logging', is_flag=True)
 @click.option('--sns-topic', help='Send SNS notification for failures')
 def scan(buckets, log_bucket=None, log_prefix=None, skip_logging=False, skip_versioning=False, skip_default_encryption=False, default_encryption=True, object_level_logging=False, sns_topic=None):
@@ -527,7 +527,7 @@ def enable_versioning(buckets, dry_run=False):
 @cli.command(name='enable-default-encryption')
 @click.argument('buckets', nargs=-1)
 @click.option('--dry-run', is_flag=True, help='Dry run')
-def enable_versioning(buckets, dry_run=False):
+def enable_default_encryption(buckets, dry_run=False):
     fix_check(EncryptionCheck, buckets, dry_run)
 
 
@@ -704,3 +704,12 @@ def update_policy(bucket, encryption=None, dry_run=False):
 def delete_policy(bucket):
     s3().Bucket(bucket).Policy().delete()
     puts('Policy deleted')
+
+
+def main():
+    try:
+        cli()
+    except (botocore.exceptions.BotoCoreError, botocore.exceptions.ClientError) as e:
+        abort(str(e))
+    except KeyboardInterrupt:
+        sys.exit(1)
